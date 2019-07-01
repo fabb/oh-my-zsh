@@ -75,6 +75,7 @@ prompt_segment() {
 # End the prompt, closing any open segments
 prompt_end() {
   if [[ -n $CURRENT_BG ]]; then
+    # echo -n " %{%K{yellow}%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR%{%F{red}%}%{%k%} "
     echo -n " %{%k%F{$CURRENT_BG}%}$SEGMENT_SEPARATOR"
   else
     echo -n "%{%k%}"
@@ -89,7 +90,7 @@ prompt_end() {
 # Context: user@hostname (who am I and where am I)
 prompt_context() {
   if [[ "$USERNAME" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
-    prompt_segment black default "%(!.%{%F{yellow}%}.)%n@%m"
+    prompt_segment black white "%(!.%{%F{yellow}%}.)%n@%m"
   fi
 }
 
@@ -106,15 +107,15 @@ prompt_git() {
   }
   local ref dirty mode repo_path
 
-   if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]]; then
-    repo_path=$(git rev-parse --git-dir 2>/dev/null)
-    dirty=$(parse_git_dirty)
-    ref=$(git symbolic-ref HEAD 2> /dev/null) || ref="➦ $(git rev-parse --short HEAD 2> /dev/null)"
-    if [[ -n $dirty ]]; then
-      prompt_segment yellow black
-    else
+  if [[ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" = "true" ]]; then
+    # repo_path=$(git rev-parse --git-dir 2>/dev/null)
+    # dirty=$(parse_git_dirty)
+    # ref=$(git symbolic-ref HEAD 2> /dev/null) || ref="➦ $(git rev-parse --short HEAD 2> /dev/null)"
+    # if [[ -n $dirty ]]; then
+      # prompt_segment yellow black
+    # else
       prompt_segment green $CURRENT_FG
-    fi
+    # fi
 
     if [[ -e "${repo_path}/BISECT_LOG" ]]; then
       mode=" <B>"
@@ -135,7 +136,8 @@ prompt_git() {
     zstyle ':vcs_info:*' formats ' %u%c'
     zstyle ':vcs_info:*' actionformats ' %u%c'
     vcs_info
-    echo -n "${${ref:gs/%/%%}/refs\/heads\//$PL_BRANCH_CHAR }${vcs_info_msg_0_%% }${mode}"
+    # echo -n "${${ref:gs/%/%%}/refs\/heads\//$PL_BRANCH_CHAR }${vcs_info_msg_0_%% }${mode}"
+    echo -n "$PL_BRANCH_CHAR ${vcs_info_msg_0_%% }${mode}"
   fi
 }
 
@@ -225,7 +227,7 @@ prompt_status() {
   [[ $UID -eq 0 ]] && symbols+="%{%F{yellow}%}⚡"
   [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="%{%F{cyan}%}⚙"
 
-  [[ -n "$symbols" ]] && prompt_segment black default "$symbols"
+  [[ -n "$symbols" ]] && prompt_segment black white "$symbols"
 }
 
 #AWS Profile:
@@ -247,11 +249,11 @@ build_prompt() {
   prompt_status
   prompt_virtualenv
   prompt_aws
-  prompt_context
+  # prompt_context
   prompt_dir
   prompt_git
-  prompt_bzr
-  prompt_hg
+  # prompt_bzr
+  # prompt_hg
   prompt_end
 }
 
